@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freedom Pay Wallet â Kanban Board</title>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0a1628;--lime:#c6f135;--bg:#f0f2f5;--card:#fff;--border:#e2e5ea;--text:#1a1a2e;--muted:#6b7280;--shadow:0 1px 3px rgba(0,0,0,.08);--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ===== LOGIN SCREEN ===== */
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
+.login-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-box .logo-big{width:64px;height:64px;background:var(--lime);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;color:var(--navy);margin-bottom:16px}
+.login-box h1{font-size:1.4rem;margin-bottom:4px;color:var(--navy)}
+.login-box p{color:var(--muted);font-size:.9rem;margin-bottom:24px}
+.login-box input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:8px;font-size:1rem;outline:none;margin-bottom:16px;font-family:inherit}
+.login-box input:focus{border-color:var(--lime);box-shadow:0 0 0 3px rgba(198,241,53,.3)}
+.login-box button{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .15s}
+.login-box button:hover{background:#162240}
+.login-error{color:#dc2626;font-size:.85rem;margin-bottom:12px;display:none}
+
+/* ===== APP (hidden until login) ===== */
+.app{display:none}
+
+/* HEADER */
+.header{background:var(--navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;background:var(--lime);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:var(--navy)}
+.header h1{color:#fff;font-size:1.2rem;font-weight:700;letter-spacing:-.3px}
+.header h1 span{color:var(--lime)}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{padding:8px 16px;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-lime{background:var(--lime);color:var(--navy)}
+.btn-lime:hover{filter:brightness(.92)}
+.btn-outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25)}
+.btn-outline:hover{border-color:var(--lime);color:var(--lime)}
+
+/* ONLINE USERS */
+.online-users{display:flex;align-items:center;gap:6px;margin-right:8px}
+.online-dot{width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.online-avatars{display:flex;gap:-4px}
+.avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem;color:#fff;border:2px solid var(--navy);margin-left:-6px;cursor:default;position:relative}
+.avatar:first-child{margin-left:0}
+.avatar:hover .avatar-tooltip{display:block}
+.avatar-tooltip{display:none;position:absolute;top:38px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:4px 10px;border-radius:5px;font-size:.72rem;white-space:nowrap;z-index:10;font-weight:400}
+.online-count{color:rgba(255,255,255,.7);font-size:.78rem;white-space:nowrap}
+
+/* ACTIVITY TOAST */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:toastIn .3s ease,toastOut .3s ease 3.7s forwards;max-width:340px;pointer-events:auto}
+.toast strong{color:var(--lime)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+
+/* TOOLBAR */
+.toolbar{padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:180px;max-width:360px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;outline:none}
+.search-box:focus{border-color:var(--lime);box-shadow:0 0 0 2px rgba(198,241,53,.25)}
+.filter-select{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;background:#fff;outline:none;min-width:120px}
+.filter-select:focus{border-color:var(--lime)}
+.task-count{margin-left:auto;font-size:.82rem;color:var(--muted);white-space:nowrap}
+
+/* BOARD */
+.board{display:flex;gap:16px;padding:20px 24px;overflow-x:auto;min-height:calc(100vh - 160px);align-items:flex-start}
+.column{background:#e8ebf0;border-radius:10px;min-width:290px;max-width:340px;flex:1;display:flex;flex-direction:column}
+.column-header{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.column-title{font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:8px}
+.column-count{background:rgba(0,0,0,.1);padding:2px 8px;border-radius:10px;font-size:.75rem;font-weight:600}
+.col-todo .column-title{color:#3b82f6}
+.col-inprogress .column-title{color:#f59e0b}
+.col-paused .column-title{color:#ef4444}
+.col-done .column-title{color:#10b981}
+.add-task-btn{padding:4px 10px;background:transparent;border:1px dashed rgba(0,0,0,.2);border-radius:6px;font-size:.78rem;cursor:pointer;color:var(--muted);font-weight:600;transition:all .15s}
+.add-task-btn:hover{border-color:var(--navy);color:var(--navy)}
+.card-list{padding:8px 10px 14px;flex:1;min-height:60px;display:flex;flex-direction:column;gap:8px}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow);cursor:grab;border:1px solid transparent;transition:all .15s}
+.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);border-color:var(--lime)}
+.card.sortable-ghost{opacity:.4}
+.card.sortable-chosen{box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.card-task{font-size:.85rem;font-weight:600;line-height:1.35;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.badge{padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600;white-space:nowrap}
+.badge-project{color:#fff}
+.badge-owner{background:#eef2ff;color:#4338ca}
+.badge-priority-High{background:#fef2f2;color:#dc2626}
+.badge-priority-Medium{background:#fffbeb;color:#d97706}
+.badge-priority-Low{background:#f0fdf4;color:#16a34a}
+.badge-deadline{background:#f8fafc;color:#64748b;font-size:.7rem}
+.card-hidden{display:none!important}
+
+/* DELETE BTN */
+.card-delete{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:4px;border:none;background:transparent;color:#cbd5e1;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+.card{position:relative}
+.card:hover .card-delete{display:flex}
+.card-delete:hover{background:#fef2f2;color:#dc2626}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.modal-header{padding:20px 24px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-header h2{font-size:1.05rem;font-weight:700}
+.modal-close{width:32px;height:32px;border:none;background:#f1f5f9;border-radius:6px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:#e2e8f0}
+.modal-body{padding:20px 24px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:.88rem;font-family:inherit;outline:none}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--lime);box-shadow:0 0 0 2px rgba(198,241,53,.25)}
+.form-group textarea{resize:vertical;min-height:70px}
+.modal-footer{padding:14px 24px 20px;display:flex;gap:8px;justify-content:flex-end}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:#162240}
+.btn-danger{background:#fee2e2;color:#dc2626}
+.btn-danger:hover{background:#fecaca}
+.btn-cancel{background:#f1f5f9;color:#475569}
+.btn-cancel:hover{background:#e2e8f0}
+
+/* FOOTER */
+.footer{padding:14px 24px;text-align:center;border-top:1px solid var(--border);background:#fff}
+.footer button{background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;text-decoration:underline}
+.footer button:hover{color:#dc2626}
+.footer .user-label{color:var(--muted);font-size:.78rem;margin-left:16px}
+
+/* CONNECTION STATUS */
+.conn-status{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:16px 28px;border-radius:10px;font-size:.9rem;z-index:400;display:none;text-align:center}
+.conn-status.show{display:block}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .board{padding:12px;gap:12px}
+  .column{min-width:260px}
+  .header{padding:10px 14px}
+  .toolbar{padding:10px 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="logo-big">F</div>
+    <h1>Freedom Pay Wallet</h1>
+    <p>Enter your name to join the Kanban board</p>
+    <div class="login-error" id="loginError">Please enter your name</div>
+    <input type="text" id="loginName" placeholder="Your name..." autofocus>
+    <button onclick="doLogin()">Join Board</button>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div class="app" id="app">
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">F</div>
+      <h1>Freedom <span>Pay Wallet</span> â Kanban</h1>
+    </div>
+    <div class="header-actions">
+      <div class="online-users">
+        <span class="online-dot"></span>
+        <div class="online-avatars" id="onlineAvatars"></div>
+        <span class="online-count" id="onlineCount"></span>
+      </div>
+      <button class="btn btn-lime" onclick="exportCSV()">&#11015; Export CSV</button>
+      <button class="btn btn-outline" id="logoutBtn" onclick="doLogout()">Log out</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" class="search-box" id="searchBox" placeholder="Search tasks..." oninput="applyFilters()">
+    <select class="filter-select" id="filterProject" onchange="applyFilters()"><option value="">All Projects</option></select>
+    <select class="filter-select" id="filterOwner" onchange="applyFilters()"><option value="">All Owners</option></select>
+    <select class="filter-select" id="filterPriority" onchange="applyFilters()"><option value="">All Priorities</option></select>
+    <span class="task-count" id="taskCount"></span>
+  </div>
+
+  <div class="board" id="board">
+    <div class="column col-todo">
+      <div class="column-header"><span class="column-title">&#9899; To Do <span class="column-count" id="count-todo">0</span></span><button class="add-task-btn" onclick="openAddModal('todo')">+ Add</button></div>
+      <div class="card-list" id="col-todo"></div>
+    </div>
+    <div class="column col-inprogress">
+      <div class="column-header"><span class="column-title">&#9898; In Progress <span class="column-count" id="count-inprogress">0</span></span><button class="add-task-btn" onclick="openAddModal('inprogress')">+ Add</button></div>
+      <div class="card-list" id="col-inprogress"></div>
+    </div>
+    <div class="column col-paused">
+      <div class="column-header"><span class="column-title">&#128308; Paused <span class="column-count" id="count-paused">0</span></span><button class="add-task-btn" onclick="openAddModal('paused')">+ Add</button></div>
+      <div class="card-list" id="col-paused"></div>
+    </div>
+    <div class="column col-done">
+      <div class="column-header"><span class="column-title">&#9989; Done <span class="column-count" id="count-done">0</span></span><button class="add-task-btn" onclick="openAddModal('done')">+ Add</button></div>
+      <div class="card-list" id="col-done"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button onclick="resetBoard()">Reset to original data</button>
+    <span class="user-label" id="userLabel"></span>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Task Details</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Project</label><input id="f-project"></div>
+      <div class="form-group"><label>Task</label><input id="f-task"></div>
+      <div class="form-group"><label>Output</label><input id="f-output"></div>
+      <div class="form-group"><label>Notes</label><textarea id="f-notes"></textarea></div>
+      <div class="form-group"><label>Owner</label><input id="f-owner"></div>
+      <div class="form-group"><label>Priority</label>
+        <select id="f-priority"><option value="">â</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+      </div>
+      <div class="form-group"><label>Deadline</label><input id="f-deadline" type="date"></div>
+      <div class="form-group"><label>Time (Hours)</label><input id="f-time" type="text"></div>
+      <div class="form-group"><label>Time Taken</label><input id="f-timetaken" type="text"></div>
+      <div class="form-group"><label>Links</label><input id="f-links"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="btnDelete" onclick="deleteTask()">Delete</button>
+      <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- CONNECTION STATUS -->
+<div class="conn-status" id="connStatus">Reconnecting...</div>
+
+<script>
+// ===== SOCKET.IO =====
+const socket = io();
+let currentUser = '';
+
+// ===== PROJECT COLOUR MAP =====
+const PROJECT_COLORS = {};
+const PALETTE = [
+  '#3b82f6','#8b5cf6','#ec4899','#f97316','#14b8a6','#6366f1','#ef4444',
+  '#06b6d4','#84cc16','#a855f7','#f43f5e','#0ea5e9','#eab308','#22c55e',
+  '#d946ef','#64748b','#fb923c','#2dd4bf','#a78bfa','#f472b6','#38bdf8',
+  '#4ade80','#facc15','#c084fc','#fb7185','#34d399'
+];
+let colorIdx = 0;
+function getProjectColor(p) {
+  if (!p) return '#94a3b8';
+  if (!PROJECT_COLORS[p]) { PROJECT_COLORS[p] = PALETTE[colorIdx % PALETTE.length]; colorIdx++; }
+  return PROJECT_COLORS[p];
+}
+
+// ===== DATA =====
+let tasks = [];
+let editingId = null;
+let addToColumn = null;
+
+function generateId() { return 'task_' + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
+
+function getDefaultData() {
+  const raw = [
+    {project:"Case Study",task:"Red Cross dibursement",output:"1 pager",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Case Study",task:"Gambia x Women Rural Villages outreach",output:"1 pager",time:"",notes:"Hitting 20 villages. 3 have already been done. 75 people impacted.",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Content Creation",task:"Package existing video content and imagery into social media ready formats",output:"Content library",time:"3",notes:"Repurpose existing assets",links:"",deadline:"",timetaken:"",priority:"",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"Events",task:"Capture dates and application windows for Sifted or other relevant conferences (e.g., annual Sifted event) for Freedom to speak at",output:"Application requirement doc",time:"",notes:"Consultant suggested attending Sifted conference next year to build network.",links:"Event websites; calendar",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Events",task:"Create a list of 100 relevant events across Fintech, Blockchain, Development, NGOs",output:"Events spreadsheet",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Founder Branding",task:"Create a strategy document, with competitors, inspirations etc",output:"1 pager",time:"1",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"Sebuh",start:true,paused:false,done:false},
+    {project:"Founder Branding",task:"LinkedIn content: 8 posts signed off with captions - 2x week cadence to start with",output:"8 posts signed off on a google sheet",time:"1",notes:"",links:"",deadline:"1/26/2026",timetaken:"",priority:"",owner:"Sebuh",start:true,paused:false,done:true},
+    {project:"Founder Branding",task:"Optimise Freedom LI profile, titles, headlines",output:"",time:"",notes:"",links:"",deadline:"1/27/2026",timetaken:"",priority:"",owner:"Sebuh",start:true,paused:false,done:true},
+    {project:"Founder Branding",task:"Founder Africa Vlog - Organise clips and create video",output:"",time:"",notes:"Series of videos to be distributed on TikTok, LinkedIn & Instagram",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"FPW Branding",task:"Create a google doc with basic branding/colours etc",output:"1 pager",time:"",notes:"",links:"",deadline:"1/28/2026",timetaken:"",priority:"",owner:"Sebuh/Freedom",start:true,paused:false,done:true},
+    {project:"FPW Branding",task:"Create a comprehensive brand book",output:"PDF document",time:"",notes:"Consolidate everything into a PDF - use Paywise as a template",links:"",deadline:"3/31/2026",timetaken:"",priority:"Low",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"FPW Branding",task:"Add all logos to Gdrive",output:"Files in drive",time:"",notes:"",links:"",deadline:"1/27/2026",timetaken:"",priority:"",owner:"Freedom",start:true,paused:false,done:true},
+    {project:"FPW Social Media",task:"Create a social strategy doc and execution plan",output:"1 pager",time:"1",notes:"",links:"",deadline:"1/21/2026",timetaken:"",priority:"",owner:"Sebuh",start:true,paused:false,done:false},
+    {project:"FPW Social Media",task:"Create 15 posts and captions repurposed across LinkedIn, Instagram & X",output:"15 posts signed off on a google sheet",time:"4",notes:"",links:"",deadline:"1/21/2026",timetaken:"",priority:"",owner:"Sebuh",start:true,paused:false,done:false},
+    {project:"FPW Social Media",task:"Optimise profiles of all socials + create official Facebook Page",output:"Optimised profile bios + new FB page",time:"0.5",notes:"",links:"",deadline:"1/21/2026",timetaken:"",priority:"",owner:"",start:true,paused:false,done:true},
+    {project:"FPW Social Media",task:"Repurpose videos which have been captured",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:true,paused:false,done:false},
+    {project:"FPW Social Media",task:"Create a list of organisations for our social media radar i.e. Stellar, Coinbase, UNDP - create a list of 10 organisations",output:"",time:"",notes:"",links:"https://drive.google.com/file/d/1VcNASQc3_BD6ZwXNqcaFg0ftO6ZuHZ3j/view?usp=drive_link",deadline:"1/30/2026",timetaken:"",priority:"",owner:"Freedom",start:true,paused:false,done:true},
+    {project:"FPW Social Media",task:"Schedule March social media posts - 3-4 posts a week, 3 images + 1 video",output:"6 posts",time:"",notes:"",links:"",deadline:"3/20/2026",timetaken:"",priority:"High",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"FPW Social Media",task:"Schedule April social media posts",output:"12 posts",time:"",notes:"",links:"",deadline:"3/27/2026",timetaken:"",priority:"Medium",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"FPW Social Media",task:"Create new format: overlay Brand/logo onto some photos",output:"Canva template",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"Low",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"FPW Social Media",task:"New format: Graphics based",output:"Canva template",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"Low",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"FPW Social Media",task:"New clip format: B-roll + bold text + logo",output:"Veed template",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Funnels",task:"Create a template for UNDP contact to reach out to Qatar Investment fund & charitable partners",output:"",time:"",notes:"Funds doing charitable work. Create lists, messaging templates + inbound funnel -> Call script",links:"",deadline:"4/17/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Funnels",task:"Create funnel to send program PDFs to relevant organisations",output:"",time:"",notes:"Anniella has created some amazing program PDFs which we need to get into the hands of the right organisations",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Grants",task:"Consolidate all current and past grant applications and drafts into a single folder",output:"Central grant folder",time:"",notes:"Founder has a grant writer on the team; unify these assets for reuse.",links:"Grant documents in Drive",deadline:"4/10/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Grants",task:"Review recent grants to extract key narratives and data points useful for investor materials",output:"Grant insights summary",time:"",notes:"Grant language can inform positioning around impact and outcomes. + Only got 2 grants applying for + Add these into Claude cowork",links:"Grant applications; NGO deck",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Grants",task:"Create an AI workflow for grants - use Claude",output:"",time:"",notes:"",links:"",deadline:"3/17/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Grants",task:"Consolidate all current and past grant applications and drafts into a single folder (2)",output:"Central grant folder",time:"",notes:"Founder has a grant writer on the team; unify these assets for reuse.",links:"Grant documents in Drive",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Investment",task:"Create investment strategy document, with roadmap and checklist",output:"1 pager",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"Medium",owner:"",start:false,paused:false,done:false},
+    {project:"Investment",task:"Create a list of relevant VCs and investors",output:"Investor list sheet",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Investment",task:"Valuation - do some strategy work on how to value the company and exit opportunities",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Investment",task:"Share UNDP letter of support with VCs and in pitch materials",output:"Letter in deck",time:"0.5",notes:"Proof of partnerships",links:"",deadline:"",timetaken:"",priority:"",owner:"Freedom",start:false,paused:false,done:false},
+    {project:"Investment",task:"Develop VC outreach strategy separate from donor track",output:"Strategy doc",time:"2",notes:"Seb leads VC fundraising",links:"",deadline:"",timetaken:"",priority:"",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"VC Funding",task:"Create a VC pitch deck",output:"",time:"",notes:"",links:"",deadline:"4/30/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"VC Funding",task:"Stellar VC fund research",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Market Research",task:"Understand the market + create a research document",output:"",time:"",notes:"How much can we save people? We can use Claude to do this",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Market Research",task:"UN - understand all the organisations and map out everyone relevant for us",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Market Research",task:"Development Funds - Qatar Development Fund, Saudi Development Fund",output:"",time:"",notes:"For them to use the tech + grants",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Market Research",task:"Tier 1 Charities - Islamic Relief, Red Cross, Save The Children",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Get LinkedIn Sales Navigator charity discount",output:"",time:"",notes:"",links:"",deadline:"3/17/2026",timetaken:"",priority:"High",owner:"Freedom",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Create LinkedIn outbound playbook: ICPs, messaging, tools",output:"1 pager",time:"1",notes:"Core audiences: Charity orgs + UN",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Create and extract list of 300 contacts",output:"Spreadsheet",time:"2",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Add 50 ICP targets every week - Feb Week 1",output:"50 LI invites",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Add 50 ICP targets every week - Feb Week 2",output:"50 LI invites",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Add 50 ICP targets every week - Feb Week 3",output:"50 LI invites",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Add 50 ICP targets every week - Feb Week 4",output:"50 LI invites",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"LinkedIn Outbound",task:"Give Seb access to LinkedIn profile + sales navigator",output:"Access to LI & Sales Nav",time:"0.5",notes:"",links:"",deadline:"1/27/2026",timetaken:"",priority:"",owner:"",start:true,paused:false,done:true},
+    {project:"Onboarding & CS",task:"Draft a basic FAQ document for NGOs and beneficiaries (USDC, KYC, access, cash-out)",output:"FAQ document",time:"",notes:"Typical questions around stablecoins, regulations, and access must be addressed.",links:"Existing support emails; deck content",deadline:"4/30/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Onboarding & CS",task:"Write a simple NGO onboarding checklist (from first contact to first successful disbursement)",output:"Checklist document",time:"",notes:"Ensures consistent experience for early NGOs and charities.",links:"Internal onboarding docs; portal UI",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Onboarding & CS",task:"Video walkthrough: Onboarding + Verification + Offramping via moneygram",output:"",time:"",notes:"Clear video with a voiceover going through everything",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"FPW Academy",task:"Create a strategy document",output:"",time:"",notes:"50 people = 4 disbursements - how do we train them? They have to do a virtual course, pass a test, get a certification. Can we create a FAQ chatbot?",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"FPW Academy",task:"Create videos for each stage",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Pitch Decks",task:"NGOs - create pitch deck for this segment",output:"PDF document",time:"",notes:"Anniella has started on doing some decks",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:true,paused:false,done:false},
+    {project:"Pitch Decks",task:"NGOs - create a script for NGO pitching and grant funding",output:"Script doc",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:true,paused:false,done:false},
+    {project:"Pitch Decks",task:"Investment - create an investor deck that is 8-10 slides",output:"PDF document",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Pitch Decks",task:"Create a google doc for basic slides",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Pitch Decks",task:"Feed in all material into claude to help create story and outline",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Pitch Decks",task:"Investment - create a script for NGO pitching and grant funding",output:"Script doc",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Pitch Decks",task:"Record pitching videos for feedback and analysis",output:"2 videos",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"PR",task:"Create a list of high-impact PR moments to reserve (major product launch, significant funding, big partnerships)",output:"PR moment roadmap",time:"",notes:"Consultant recommends saving PR for really big, juicy announcements.",links:"Internal roadmap; partnership pipeline",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"PR",task:"Identify 5-10 relevant tech/fintech media outlets (e.g., TechCrunch, Sifted) for future funding announcements",output:"Media target list",time:"",notes:"Consultant cited TechCrunch and Sifted as typical outlets for funding news.",links:"Media outlet list",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"PR",task:"Create a blog page + add announcements in there",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Product",task:"Create wallet plugin for Claude",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Product / Service Delivery",task:"Document current NGO onboarding workflow into the Freedom Pay portal step by step",output:"Onboarding workflow doc",time:"",notes:"Platform for onboarding NGOs to send USDC disbursements exists; process must be explicit.",links:"Freedom Pay portal; internal docs",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Product / Service Delivery",task:"Gather feedback objectives and questions for the first five NGO design partners",output:"Feedback questionnaire",time:"",notes:"Founder wants feedback from first five organizations to refine user experience and onboarding.",links:"Internal product notes; NGO interviews",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Product / Service Delivery",task:"Create a feedback collection template (form or doc) for NGOs after first disbursement runs",output:"Feedback form",time:"",notes:"Helps systematize qualitative and quantitative feedback from design partners.",links:"Google Form; template doc",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Programme Development",task:"Develop donor/NGO outreach strategy",output:"Strategy doc",time:"2",notes:"Freedom leads programme track",links:"",deadline:"",timetaken:"",priority:"",owner:"Freedom",start:false,paused:false,done:false},
+    {project:"Programme Development",task:"Create refugee programme pitch deck (Sudan, Yemen, Afghanistan)",output:"Pitch deck",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"Freedom",start:false,paused:false,done:false},
+    {project:"Project Management",task:"Create a weekly standup - Monday 1pm",output:"Calendar invites",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:true,paused:false,done:false},
+    {project:"Project Management",task:"Create a FPW manual/process doc/knowledge base",output:"Google doc",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Project Management",task:"Create folders in shared google drive and upload all key documents",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Research",task:"Create an AI workflow for researching the right opportunities",output:"Workflow doc",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Research",task:"Document ChatGPT research workflow",output:"Workflow doc",time:"1",notes:"AI research process",links:"",deadline:"",timetaken:"",priority:"",owner:"Freedom",start:false,paused:false,done:false},
+    {project:"UNDP Partnership",task:"Schedule official meeting with UNDP Gambia, Stellar Network, and Gambian government",output:"Meeting scheduled",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"Freedom",start:false,paused:false,done:false},
+    {project:"UNDP Partnership",task:"Follow up with UNDP fellow for introductions and outreach support",output:"Email/notes",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"Freedom",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Anniella video on UNDP x Redcross Gambia",output:"1 min video",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"High",owner:"Anniella",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Create script: Anniella video on UNDP x Redcross Gambia",output:"Document",time:"",notes:"",links:"",deadline:"3/17/2026",timetaken:"",priority:"High",owner:"Sebuh/Freedom",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Record & Edit Video: Anniella video on UNDP x Redcross Gambia",output:"Video",time:"",notes:"",links:"",deadline:"3/20/2026",timetaken:"",priority:"High",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Ethiopia Clips - Upload all clips to a drive",output:"Folder",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"Medium",owner:"",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Uganda Clips - Upload all clips to a drive",output:"Folder",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"Medium",owner:"",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Uganda Kitega Case Study Video: Reduce script and edit it",output:"Video",time:"",notes:"",links:"",deadline:"3/20/2026",timetaken:"",priority:"High",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Uganda Sudan Refugee Case Study Video: Edit video",output:"Video",time:"",notes:"",links:"",deadline:"4/3/2026",timetaken:"",priority:"High",owner:"Sebuh",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Founder videos - create a list of 14 questions for founder",output:"",time:"",notes:"",links:"",deadline:"4/10/2026",timetaken:"",priority:"Medium",owner:"",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Founder video shoot - shoot founder content",output:"",time:"",notes:"",links:"",deadline:"4/10/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Video Production",task:"FPW Content - create a document for street interviews",output:"",time:"",notes:"",links:"",deadline:"4/3/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Video Production",task:"Street interviews test video",output:"",time:"",notes:"Awareness on cross border payments, digital assets, charity giving/transparent charity. This stream is for B2C - education - gift cards etc - you can get nandos with USDC - video can be gift card services. Aim is to create B2C videos which can go viral",links:"",deadline:"4/10/2026",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+    {project:"Video Production",task:"FPW Video shoot - capture 20 street interviews",output:"",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
+  ];
+  return raw.map(r => ({...r, id: generateId(), column: getColumn(r)}));
+}
+
+function getColumn(r) {
+  if (r.done === true || r.done === 'TRUE') return 'done';
+  if (r.paused === true || r.paused === 'TRUE') return 'paused';
+  if (r.start === true || r.start === 'TRUE') return 'inprogress';
+  return 'todo';
+}
+
+// ===== LOGIN =====
+function doLogin() {
+  const name = document.getElementById('loginName').value.trim();
+  if (!name) {
+    document.getElementById('loginError').style.display = 'block';
+    return;
+  }
+  currentUser = name;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('userLabel').textContent = 'Logged in as: ' + name;
+  socket.emit('join', name);
+}
+
+function doLogout() {
+  location.reload();
+}
+
+document.getElementById('loginName').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ===== SOCKET EVENTS =====
+socket.on('init', (data) => {
+  if (data.tasks) {
+    tasks = data.tasks;
+  } else {
+    tasks = getDefaultData();
+    // First user - send default data to server
+    socket.emit('task-added', { tasks, taskName: 'initial data' });
+  }
+  populateFilters();
+  render();
+  initSortable();
+  updateOnlineUsers(data.onlineUsers || []);
+});
+
+socket.on('board-updated', (data) => {
+  tasks = data.tasks;
+  populateFilters();
+  render();
+  initSortable();
+});
+
+socket.on('users-updated', (users) => {
+  updateOnlineUsers(users);
+});
+
+socket.on('activity', (data) => {
+  showToast(data.user, data.action);
+});
+
+socket.on('disconnect', () => {
+  document.getElementById('connStatus').classList.add('show');
+  document.getElementById('connStatus').textContent = 'Connection lost. Reconnecting...';
+});
+
+socket.on('connect', () => {
+  const status = document.getElementById('connStatus');
+  if (status.classList.contains('show')) {
+    status.textContent = 'Reconnected!';
+    setTimeout(() => status.classList.remove('show'), 1500);
+    if (currentUser) socket.emit('join', currentUser);
+  }
+});
+
+// ===== ONLINE USERS =====
+function updateOnlineUsers(users) {
+  const container = document.getElementById('onlineAvatars');
+  const countEl = document.getElementById('onlineCount');
+  container.innerHTML = '';
+  users.forEach(u => {
+    const initials = u.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const div = document.createElement('div');
+    div.className = 'avatar';
+    div.style.background = u.color;
+    div.textContent = initials;
+    div.innerHTML += `<span class="avatar-tooltip">${escHtml(u.name)}</span>`;
+    container.appendChild(div);
+  });
+  countEl.textContent = users.length + ' online';
+}
+
+// ===== TOAST =====
+function showToast(user, action) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<strong>${escHtml(user)}</strong> ${escHtml(action)}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// ===== RENDER =====
+function render() {
+  const cols = {todo:[], inprogress:[], paused:[], done:[]};
+  tasks.forEach(t => { if (cols[t.column]) cols[t.column].push(t); });
+  ['todo','inprogress','paused','done'].forEach(col => {
+    const el = document.getElementById('col-' + col);
+    el.innerHTML = '';
+    cols[col].forEach(t => el.appendChild(createCard(t)));
+  });
+  updateCounts();
+  applyFilters();
+}
+
+function createCard(t) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.dataset.id = t.id;
+  const pColor = getProjectColor(t.project);
+  let badges = '';
+  if (t.project) badges += `<span class="badge badge-project" style="background:${pColor}">${escHtml(t.project)}</span>`;
+  if (t.owner) badges += `<span class="badge badge-owner">${escHtml(t.owner)}</span>`;
+  if (t.priority) badges += `<span class="badge badge-priority-${t.priority}">${t.priority}</span>`;
+  if (t.deadline) badges += `<span class="badge badge-deadline">${escHtml(t.deadline)}</span>`;
+  div.innerHTML = `<button class="card-delete" onclick="event.stopPropagation();confirmDelete('${t.id}')">&times;</button>
+    <div class="card-task">${escHtml(t.task)}</div>
+    <div class="card-meta">${badges}</div>`;
+  div.addEventListener('click', () => openEditModal(t.id));
+  return div;
+}
+
+function escHtml(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function updateCounts() {
+  const cols = {todo:0,inprogress:0,paused:0,done:0};
+  tasks.forEach(t => { if (cols[t.column] !== undefined) cols[t.column]++; });
+  document.getElementById('count-todo').textContent = cols.todo;
+  document.getElementById('count-inprogress').textContent = cols.inprogress;
+  document.getElementById('count-paused').textContent = cols.paused;
+  document.getElementById('count-done').textContent = cols.done;
+  document.getElementById('taskCount').textContent = `${tasks.length} tasks total`;
+}
+
+// ===== FILTERS =====
+function populateFilters() {
+  const projects = [...new Set(tasks.map(t=>t.project).filter(Boolean))].sort();
+  const owners = [...new Set(tasks.map(t=>t.owner).filter(Boolean))].sort();
+  const fp = document.getElementById('filterProject');
+  const fo = document.getElementById('filterOwner');
+  fp.innerHTML = '<option value="">All Projects</option>' + projects.map(p=>`<option>${escHtml(p)}</option>`).join('');
+  fo.innerHTML = '<option value="">All Owners</option>' + owners.map(o=>`<option>${escHtml(o)}</option>`).join('');
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  const proj = document.getElementById('filterProject').value;
+  const own = document.getElementById('filterOwner').value;
+  const pri = document.getElementById('filterPriority').value;
+  let visible = 0;
+  document.querySelectorAll('.card').forEach(card => {
+    const t = tasks.find(t => t.id === card.dataset.id);
+    if (!t) return;
+    let show = true;
+    if (q && !(t.task||'').toLowerCase().includes(q) && !(t.project||'').toLowerCase().includes(q) && !(t.notes||'').toLowerCase().includes(q) && !(t.owner||'').toLowerCase().includes(q)) show = false;
+    if (proj && t.project !== proj) show = false;
+    if (own && t.owner !== own) show = false;
+    if (pri && t.priority !== pri) show = false;
+    card.classList.toggle('card-hidden', !show);
+    if (show) visible++;
+  });
+  updateCounts();
+}
+
+// ===== DRAG & DROP =====
+let sortableInstances = [];
+function initSortable() {
+  // Destroy old instances
+  sortableInstances.forEach(s => s.destroy());
+  sortableInstances = [];
+
+  ['todo','inprogress','paused','done'].forEach(col => {
+    const instance = new Sortable(document.getElementById('col-' + col), {
+      group: 'kanban',
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      dragClass: 'sortable-drag',
+      onEnd: function(evt) {
+        const id = evt.item.dataset.id;
+        const newCol = evt.to.id.replace('col-','');
+        const t = tasks.find(t => t.id === id);
+        if (t) {
+          t.column = newCol;
+          t.start = (newCol === 'inprogress' || newCol === 'done');
+          t.paused = (newCol === 'paused');
+          t.done = (newCol === 'done');
+          if (newCol === 'todo') { t.start = false; t.paused = false; t.done = false; }
+          socket.emit('task-moved', { taskId: id, newColumn: newCol, tasks });
+          updateCounts();
+        }
+      }
+    });
+    sortableInstances.push(instance);
+  });
+}
+
+// ===== MODAL =====
+function openAddModal(col) {
+  editingId = null;
+  addToColumn = col;
+  document.getElementById('modalTitle').textContent = 'Add New Task';
+  document.getElementById('btnDelete').style.display = 'none';
+  clearForm();
+  showModal();
+}
+
+function openEditModal(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  editingId = id;
+  addToColumn = null;
+  document.getElementById('modalTitle').textContent = 'Edit Task';
+  document.getElementById('btnDelete').style.display = '';
+  document.getElementById('f-project').value = t.project || '';
+  document.getElementById('f-task').value = t.task || '';
+  document.getElementById('f-output').value = t.output || '';
+  document.getElementById('f-notes').value = t.notes || '';
+  document.getElementById('f-owner').value = t.owner || '';
+  document.getElementById('f-priority').value = t.priority || '';
+  document.getElementById('f-time').value = t.time || '';
+  document.getElementById('f-timetaken').value = t.timetaken || '';
+  document.getElementById('f-links').value = t.links || '';
+  let dl = t.deadline || '';
+  if (dl && !dl.match(/^\d{4}-/)) {
+    const parts = dl.split('/');
+    if (parts.length === 3) dl = `${parts[2]}-${parts[0].padStart(2,'0')}-${parts[1].padStart(2,'0')}`;
+    else if (parts.length === 2) dl = `2026-${parts[0].padStart(2,'0')}-${parts[1].padStart(2,'0')}`;
+  }
+  document.getElementById('f-deadline').value = dl;
+  showModal();
+}
+
+function clearForm() {
+  ['f-project','f-task','f-output','f-notes','f-owner','f-links','f-time','f-timetaken'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-priority').value = '';
+  document.getElementById('f-deadline').value = '';
+}
+
+function showModal() { document.getElementById('modalOverlay').classList.add('active'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); editingId = null; addToColumn = null; }
+
+function saveTask() {
+  const data = {
+    project: document.getElementById('f-project').value.trim(),
+    task: document.getElementById('f-task').value.trim(),
+    output: document.getElementById('f-output').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    owner: document.getElementById('f-owner').value.trim(),
+    priority: document.getElementById('f-priority').value,
+    time: document.getElementById('f-time').value.trim(),
+    timetaken: document.getElementById('f-timetaken').value.trim(),
+    links: document.getElementById('f-links').value.trim(),
+  };
+  let dl = document.getElementById('f-deadline').value;
+  if (dl) { const d = new Date(dl + 'T00:00:00'); data.deadline = `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`; }
+  else data.deadline = '';
+  if (!data.task) { alert('Task name is required'); return; }
+
+  if (editingId) {
+    const t = tasks.find(t => t.id === editingId);
+    if (t) Object.assign(t, data);
+    socket.emit('task-edited', { tasks, taskName: data.task });
+  } else {
+    const col = addToColumn || 'todo';
+    const t = {...data, id: generateId(), column: col, start: (col==='inprogress'||col==='done'), paused: col==='paused', done: col==='done'};
+    tasks.push(t);
+    socket.emit('task-added', { tasks, taskName: data.task });
+  }
+  populateFilters();
+  render();
+  initSortable();
+  closeModal();
+}
+
+function confirmDelete(id) {
+  const t = tasks.find(t => t.id === id);
+  if (confirm('Delete this task?')) {
+    const name = t ? t.task : '';
+    tasks = tasks.filter(t => t.id !== id);
+    socket.emit('task-deleted', { tasks, taskName: name });
+    populateFilters();
+    render();
+    initSortable();
+  }
+}
+
+function deleteTask() {
+  if (editingId && confirm('Delete this task?')) {
+    const t = tasks.find(t => t.id === editingId);
+    const name = t ? t.task : '';
+    tasks = tasks.filter(t => t.id !== editingId);
+    socket.emit('task-deleted', { tasks, taskName: name });
+    populateFilters();
+    render();
+    initSortable();
+    closeModal();
+  }
+}
+
+// ===== CSV EXPORT =====
+function exportCSV() {
+  const headers = ['Project','Tasks','Output','Time (Hours)','Start','Pause','Done','Notes','Links','Deadline','Time taken','Priority','Owner'];
+  const rows = tasks.map(t => [
+    t.project || '',t.task || '',t.output || '',t.time || '',
+    (t.column === 'inprogress' || t.column === 'done') ? 'TRUE' : 'FALSE',
+    t.column === 'paused' ? 'TRUE' : 'FALSE',
+    t.column === 'done' ? 'TRUE' : 'FALSE',
+    t.notes || '',t.links || '',t.deadline || '',t.timetaken || '',t.priority || '',t.owner || ''
+  ]);
+  const csvContent = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'fpw_kanban_export.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== RESET =====
+function resetBoard() {
+  if (confirm('Reset board to original data? All changes will be lost for everyone.')) {
+    tasks = getDefaultData();
+    socket.emit('board-reset', { tasks });
+    populateFilters();
+    render();
+    initSortable();
+  }
+}
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+</script>
+</body>
+</html>
