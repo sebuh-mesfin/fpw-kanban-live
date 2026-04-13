@@ -1,0 +1,48 @@
+{
+  "fpw": {
+    "name": "Freedom Pay Wallet",
+    "shortName": "FPW",
+    "logo": "F",
+    "slug": "fpw",
+    "colors": {
+      "navy": "#0a1628",
+      "lime": "#c6f135",
+      "bg": "#f0f2f5",
+      "card": "#ffffff",
+      "border": "#e2e5ea",
+      "text": "#1a1a2e",
+      "muted": "#6b7280",
+      "limeRgba": "rgba(198,241,53,.25)",
+      "limeRgba30": "rgba(198,241,53,.3)",
+      "hoverDark": "#162240",
+      "colTodo": "#3b82f6",
+      "colInprogress": "#f59e0b",
+      "colPaused": "#ef4444",
+      "colDone": "#10b981"
+    },
+    "csvPrefix": "fpw"
+  },
+  "analystpro": {
+    "name": "AnalystPro",
+    "shortName": "AP",
+    "logo": "A",
+    "slug": "analystpro",
+    "colors": {
+      "navy": "#121212",
+      "lime": "#275af3",
+      "bg": "#e4edec",
+      "card": "#ffffff",
+      "border": "#d3dddb",
+      "text": "#121212",
+      "muted": "#6b7280",
+      "limeRgba": "rgba(39,90,243,.25)",
+      "limeRgba30": "rgba(39,90,243,.3)",
+      "hoverDark": "#0538d8",
+      "colTodo": "#275af3",
+      "colInprogress": "#f59e0b",
+      "colPaused": "#d9117e",
+      "colDone": "#10b981"
+    },
+    "csvPrefix": "analystpro"
+  }
+}

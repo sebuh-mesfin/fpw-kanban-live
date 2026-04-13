@@ -3,9 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Freedom Pay Wallet &#8212; Kanban Board</title>
+<title>Kanban Board</title>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script>
+// Board config is injected by server — fallback for direct file access
+if (!window.BOARD_CONFIG) window.BOARD_CONFIG = {name:"Board",shortName:"KB",logo:"K",slug:"default",colors:{navy:"#0a1628",lime:"#c6f135",bg:"#f0f2f5",card:"#ffffff",border:"#e2e5ea",text:"#1a1a2e",muted:"#6b7280",limeRgba:"rgba(198,241,53,.25)",limeRgba30:"rgba(198,241,53,.3)",hoverDark:"#162240",colTodo:"#3b82f6",colInprogress:"#f59e0b",colPaused:"#ef4444",colDone:"#10b981"},csvPrefix:"board"};
+if (!window.BOARD_SLUG) window.BOARD_SLUG = "fpw";
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--navy:#0a1628;--lime:#c6f135;--bg:#f0f2f5;--card:#fff;--border:#e2e5ea;--text:#1a1a2e;--muted:#6b7280;--shadow:0 1px 3px rgba(0,0,0,.08);--radius:8px}
@@ -195,8 +200,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <!-- ===== LOGIN SCREEN ===== -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
-    <div class="logo-big">F</div>
-    <h1>Freedom Pay Wallet</h1>
+    <div class="logo-big" id="loginLogo">K</div>
+    <h1 id="loginTitle">Kanban Board</h1>
     <p>Enter your name to join the Kanban board</p>
     <div class="login-error" id="loginError">Please enter your name</div>
     <input type="text" id="loginName" placeholder="Your name..." autofocus>
@@ -208,8 +213,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="app" id="app">
   <div class="header">
     <div class="header-left">
-      <div class="logo">F</div>
-      <h1>Freedom <span>Pay Wallet</span> &#8212; Kanban</h1>
+      <div class="logo" id="headerLogo">K</div>
+      <h1 id="headerTitle">Kanban</h1>
     </div>
     <div class="header-actions">
       <div class="online-users">
@@ -299,8 +304,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="conn-status" id="connStatus">Reconnecting...</div>
 
 <script>
+// ===== BOARD CONFIG =====
+const CFG = window.BOARD_CONFIG;
+const SLUG = window.BOARD_SLUG;
+
+// Apply brand colours to CSS variables
+(function applyBrand() {
+  const r = document.documentElement.style;
+  const c = CFG.colors;
+  r.setProperty('--navy', c.navy);
+  r.setProperty('--lime', c.lime);
+  r.setProperty('--bg', c.bg);
+  r.setProperty('--card', c.card);
+  r.setProperty('--border', c.border);
+  r.setProperty('--text', c.text);
+  r.setProperty('--muted', c.muted);
+  // Update title and logos
+  document.title = CFG.name + ' \u2014 Kanban Board';
+  document.getElementById('loginLogo').textContent = CFG.logo;
+  document.getElementById('loginTitle').textContent = CFG.name;
+  document.getElementById('headerLogo').textContent = CFG.logo;
+  document.getElementById('headerTitle').innerHTML = CFG.name + ' &#8212; <span>Kanban</span>';
+  // Update column title colours
+  const style = document.createElement('style');
+  style.textContent = `.col-todo .column-title{color:${c.colTodo}}.col-inprogress .column-title{color:${c.colInprogress}}.col-paused .column-title{color:${c.colPaused}}.col-done .column-title{color:${c.colDone}}`;
+  // Focus ring colours
+  style.textContent += `.login-box input:focus{border-color:${c.lime};box-shadow:0 0 0 3px ${c.limeRgba30}}`;
+  style.textContent += `.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:${c.lime};box-shadow:0 0 0 2px ${c.limeRgba}}`;
+  style.textContent += `.search-box:focus{border-color:${c.lime};box-shadow:0 0 0 2px ${c.limeRgba}}`;
+  style.textContent += `.filter-select:focus{border-color:${c.lime}}`;
+  style.textContent += `.btn-primary:hover{background:${c.hoverDark}}`;
+  // AnalystPro needs white text on blue buttons
+  if (c.lime === '#275af3' || c.lime.startsWith('#2') || c.lime.startsWith('#0')) {
+    style.textContent += `.btn-lime{color:#fff}`;
+    style.textContent += `.logo{color:#fff}`;
+    style.textContent += `.login-box .logo-big{color:#fff}`;
+  }
+  document.head.appendChild(style);
+})();
+
 // ===== SOCKET.IO =====
-const socket = io();
+const socket = io('/' + SLUG);
 let currentUser = '';
 
 // ===== PROJECT COLOUR MAP =====
@@ -326,6 +370,8 @@ let addToColumn = null;
 function generateId() { return 'task_' + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
 
 function getDefaultData() {
+  // Non-FPW boards start empty
+  if (SLUG !== 'fpw') return [];
   const raw = [
     {project:"Case Study",task:"Red Cross dibursement",output:"1 pager",time:"",notes:"",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
     {project:"Case Study",task:"Gambia x Women Rural Villages outreach",output:"1 pager",time:"",notes:"Hitting 20 villages. 3 have already been done. 75 people impacted.",links:"",deadline:"",timetaken:"",priority:"",owner:"",start:false,paused:false,done:false},
@@ -748,7 +794,7 @@ function exportCSV() {
   const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'fpw_kanban_export.csv'; a.click();
+  a.href = url; a.download = (CFG.csvPrefix || SLUG) + '_kanban_export.csv'; a.click();
   URL.revokeObjectURL(url);
 }
 
