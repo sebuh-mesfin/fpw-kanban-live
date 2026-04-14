@@ -44,5 +44,28 @@
       "colDone": "#10b981"
     },
     "csvPrefix": "analystpro"
+  },
+  "vimutti": {
+    "name": "Vimutti",
+    "shortName": "V",
+    "logo": "V",
+    "slug": "vimutti",
+    "colors": {
+      "navy": "#1a2e1a",
+      "lime": "#e8a838",
+      "bg": "#f0f2f5",
+      "card": "#ffffff",
+      "border": "#e2e5ea",
+      "text": "#1a1a2e",
+      "muted": "#6b7280",
+      "limeRgba": "rgba(232,168,56,.25)",
+      "limeRgba30": "rgba(232,168,56,.3)",
+      "hoverDark": "#0f1f10",
+      "colTodo": "#3b82f6",
+      "colInprogress": "#f59e0b",
+      "colPaused": "#ef4444",
+      "colDone": "#10b981"
+    },
+    "csvPrefix": "vimutti"
   }
 }
