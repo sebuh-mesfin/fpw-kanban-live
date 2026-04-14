@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
 const app = express();
 const server = http.createServer(app);
@@ -14,28 +15,125 @@ const PORT = process.env.PORT || 3000;
 const BOARDS = JSON.parse(fs.readFileSync(path.join(__dirname, 'boards.json'), 'utf8'));
 const BOARD_SLUGS = Object.keys(BOARDS);
 
-// ===== Per-board data persistence =====
+// ===== GitHub persistence layer =====
+// When GITHUB_TOKEN is set, data-{slug}.json files are mirrored to the repo so they survive Render restarts.
+// Writes are debounced per-board (30s) to avoid hammering the API.
+const GH_TOKEN = process.env.GITHUB_TOKEN || '';
+const GH_REPO = process.env.GITHUB_REPO || 'sebuh-mesfin/fpw-kanban-live';
+const GH_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const DEBOUNCE_MS = 30 * 1000;
+const persistTimers = new Map();
+const shaCache = new Map();
+
+function ghApi(method, url, body) {
+  return new Promise((resolve, reject) => {
+    const data = body ? JSON.stringify(body) : null;
+    const req = https.request(url, {
+      method,
+      headers: {
+        'Authorization': `token ${GH_TOKEN}`,
+        'User-Agent': 'fpw-kanban-live-persistence',
+        'Accept': 'application/vnd.github.v3+json',
+        ...(data ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } : {})
+      }
+    }, (res) => {
+      let buf = '';
+      res.on('data', (c) => buf += c);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try { resolve(JSON.parse(buf)); } catch (e) { resolve({}); }
+        } else {
+          reject(new Error(`GitHub ${method} ${url} -> ${res.statusCode}: ${buf.slice(0, 200)}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    if (data) req.write(data);
+    req.end();
+  });
+}
+
+async function fetchFromGitHub(slug) {
+  if (!GH_TOKEN) return null;
+  const filePath = `data-${slug}.json`;
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${filePath}?ref=${GH_BRANCH}`;
+  try {
+    const resp = await ghApi('GET', url);
+    if (resp && resp.content) {
+      const content = Buffer.from(resp.content, 'base64').toString('utf8');
+      shaCache.set(slug, resp.sha);
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    if (!/404/.test(e.message)) console.error(`[gh] fetch ${slug} failed:`, e.message);
+  }
+  return null;
+}
+
+async function commitToGitHub(slug, tasks) {
+  if (!GH_TOKEN) return;
+  const filePath = `data-${slug}.json`;
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${filePath}`;
+  const content = Buffer.from(JSON.stringify(tasks, null, 2), 'utf8').toString('base64');
+  // Refresh SHA to avoid 409 conflicts
+  try {
+    const existing = await ghApi('GET', `${url}?ref=${GH_BRANCH}`);
+    if (existing && existing.sha) shaCache.set(slug, existing.sha);
+  } catch (e) { /* file may not exist yet */ }
+  const body = {
+    message: `persist: update ${filePath}`,
+    content,
+    branch: GH_BRANCH,
+    ...(shaCache.has(slug) ? { sha: shaCache.get(slug) } : {})
+  };
+  try {
+    const resp = await ghApi('PUT', url, body);
+    if (resp && resp.content && resp.content.sha) shaCache.set(slug, resp.content.sha);
+    console.log(`[gh] committed data-${slug}.json (${tasks.length} tasks)`);
+  } catch (e) {
+    console.error(`[gh] commit ${slug} failed:`, e.message);
+  }
+}
+
+function schedulePersist(slug) {
+  if (!GH_TOKEN) return;
+  if (persistTimers.has(slug)) clearTimeout(persistTimers.get(slug));
+  const t = setTimeout(() => {
+    persistTimers.delete(slug);
+    const tasks = loadLocalTasks(slug);
+    if (tasks) commitToGitHub(slug, tasks).catch(e => console.error(e));
+  }, DEBOUNCE_MS);
+  persistTimers.set(slug, t);
+}
+
+// ===== Per-board data persistence (local disk + GitHub mirror) =====
 function dataFile(slug) {
   return path.join(__dirname, `data-${slug}.json`);
 }
 
-function loadTasks(slug) {
+function loadLocalTasks(slug) {
   try {
     const f = dataFile(slug);
-    if (fs.existsSync(f)) {
-      return JSON.parse(fs.readFileSync(f, 'utf8'));
-    }
-    // Migrate legacy data.json for fpw
-    if (slug === 'fpw') {
-      const legacy = path.join(__dirname, 'data.json');
-      if (fs.existsSync(legacy)) {
-        const data = JSON.parse(fs.readFileSync(legacy, 'utf8'));
-        fs.writeFileSync(f, JSON.stringify(data, null, 2), 'utf8');
-        return data;
-      }
-    }
+    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf8'));
   } catch (e) {
-    console.error(`Error loading data for ${slug}:`, e.message);
+    console.error(`Error loading local data for ${slug}:`, e.message);
+  }
+  return null;
+}
+
+function loadTasks(slug) {
+  const local = loadLocalTasks(slug);
+  if (local) return local;
+  // Legacy migration for fpw (data.json → data-fpw.json)
+  if (slug === 'fpw') {
+    const legacy = path.join(__dirname, 'data.json');
+    if (fs.existsSync(legacy)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(legacy, 'utf8'));
+        fs.writeFileSync(dataFile(slug), JSON.stringify(data, null, 2), 'utf8');
+        return data;
+      } catch (e) { /* fall through */ }
+    }
   }
   return null;
 }
@@ -43,15 +141,34 @@ function loadTasks(slug) {
 function saveTasks(slug, tasks) {
   try {
     fs.writeFileSync(dataFile(slug), JSON.stringify(tasks, null, 2), 'utf8');
+    schedulePersist(slug);
   } catch (e) {
     console.error(`Error saving data for ${slug}:`, e.message);
+  }
+}
+
+// ===== On startup: hydrate local disk from GitHub (so we survive Render restarts) =====
+async function hydrateFromGitHub() {
+  if (!GH_TOKEN) {
+    console.log('[gh] GITHUB_TOKEN not set — persistence to GitHub disabled (local disk only, will lose data on Render restart)');
+    return;
+  }
+  console.log(`[gh] Hydrating from ${GH_REPO}@${GH_BRANCH}...`);
+  for (const slug of BOARD_SLUGS) {
+    const remote = await fetchFromGitHub(slug);
+    if (remote) {
+      fs.writeFileSync(dataFile(slug), JSON.stringify(remote, null, 2), 'utf8');
+      console.log(`[gh] hydrated data-${slug}.json (${remote.length} tasks)`);
+    } else {
+      console.log(`[gh] no remote data for ${slug}, starting fresh`);
+    }
   }
 }
 
 // ===== Read HTML template =====
 const TEMPLATE = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
 
-// ===== Static assets (CSS, JS, etc. but NOT index.html — we serve that dynamically) =====
+// ===== Static assets =====
 app.use('/static', express.static(path.join(__dirname, 'public'), { index: false }));
 
 // ===== Board picker at root =====
@@ -102,7 +219,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 BOARD_SLUGS.forEach(slug => {
   app.get(`/${slug}`, (req, res) => {
     const config = BOARDS[slug];
-    // Inject config into the template as a JS global before the closing </head>
     const configScript = `<script>window.BOARD_CONFIG=${JSON.stringify(config)};window.BOARD_SLUG="${slug}";</script>`;
     const html = TEMPLATE.replace('</head>', configScript + '\n</head>');
     res.type('html').send(html);
@@ -186,8 +302,12 @@ BOARD_SLUGS.forEach(slug => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`\n  Grow Hous3 Kanban — Multi-board`);
-  console.log(`  Boards: ${BOARD_SLUGS.join(', ')}`);
-  console.log(`  Running at http://localhost:${PORT}\n`);
+// ===== Startup =====
+hydrateFromGitHub().finally(() => {
+  server.listen(PORT, () => {
+    console.log(`\n  Grow Hous3 Kanban — Multi-board`);
+    console.log(`  Boards: ${BOARD_SLUGS.join(', ')}`);
+    console.log(`  Persistence: ${GH_TOKEN ? `GitHub (${GH_REPO}@${GH_BRANCH})` : 'LOCAL ONLY (will lose data on Render restart)'}`);
+    console.log(`  Running at http://localhost:${PORT}\n`);
+  });
 });
