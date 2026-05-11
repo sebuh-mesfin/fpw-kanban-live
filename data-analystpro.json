@@ -537,11 +537,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_41r92z",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Video Content",
@@ -588,11 +588,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_dbsxx0",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Outbound",
