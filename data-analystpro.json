@@ -554,11 +554,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_mmlgy6",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "LinkedIn Content",
@@ -826,11 +826,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_r1r337",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Video Content",
@@ -894,11 +894,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_p9ylgm",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Website",
@@ -949,23 +949,6 @@
     "paused": false,
     "done": false,
     "id": "task_1776165642298_wrqxbu",
-    "column": "todo"
-  },
-  {
-    "project": "Strategy",
-    "task": "Further test pricing models and subscription benefits",
-    "output": "Pricing test results document",
-    "time": "",
-    "notes": "Source: GTM Messaging Workshop 19 Mar",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Medium",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_ykdn8m",
     "column": "todo"
   },
   {
@@ -1727,11 +1710,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1777328571335_q4urkg",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Funnel Assets",
