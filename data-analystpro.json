@@ -44,11 +44,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_p4z3f1",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Analytics",
@@ -61,11 +61,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Elliott",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_4kos0v",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Analytics",
@@ -78,11 +78,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_134epb",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Analytics",
@@ -95,11 +95,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_yws8nh",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -112,11 +112,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_u5tnm0",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -129,11 +129,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_s4uyi7",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -146,11 +146,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_cxzqem",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -163,11 +163,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_xlm810",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -180,11 +180,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_g80y1e",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Events",
@@ -204,210 +204,6 @@
     "column": "todo"
   },
   {
-    "project": "LinkedIn Content",
-    "task": "Joe - January Week 1 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_8kp0a3",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Joe - January Week 2 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_ft9iyl",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Joe - January Week 3 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_j2vll5",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Joe - January Week 4 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_jk5wsl",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Elliot - January Week 1",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Elliott",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_4u2por",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Elliot - January Week 2",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Elliott",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_5r9bno",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Elliot - January Week 3",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Elliott",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_wqenor",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Elliot - January Week 4",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Elliott",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_1yxh8o",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Joe - February Week 1 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_a5qmy6",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Joe - February Week 2 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_obtee1",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Joe - February Week 3 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_fky6ny",
-    "column": "todo"
-  },
-  {
-    "project": "LinkedIn Content",
-    "task": "Joe - February Week 4 - 2 posts",
-    "output": "2 signed off posts",
-    "time": "1",
-    "notes": "Source: Marketing PM Sheet",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "Low",
-    "owner": "Joseph",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_u06dqr",
-    "column": "todo"
-  },
-  {
     "project": "LinkedIn Engagement",
     "task": "Engagement: Engage with all comments etc (daily or bi-daily)",
     "output": "",
@@ -418,11 +214,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_ykfd9w",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "LinkedIn Onboarding",
@@ -435,11 +231,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Elliott",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_go4dvr",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Outbound",
@@ -452,11 +248,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Elliott",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_7wjvon",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Outbound",
@@ -469,11 +265,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_fuv8wh",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Outbound",
@@ -486,11 +282,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Elliott",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_tpyvbp",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Outbound",
@@ -503,11 +299,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_ss7exs",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Outbound",
@@ -520,11 +316,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Elliott",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_7sywxl",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Project Management",
@@ -537,11 +333,11 @@
     "timetaken": "",
     "priority": "Low",
     "owner": "",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_44xyal",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Project Management",
@@ -554,11 +350,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_14m26x",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Reddit",
@@ -622,11 +418,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_hvp8r3",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -639,11 +435,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_ekqm6e",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Video Content",
@@ -656,11 +452,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_khv9o5",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Video Content",
@@ -690,11 +486,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_b2yw1d",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Accelerator",
@@ -724,11 +520,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_lup10w",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Messaging",
@@ -775,11 +571,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_4k2jy6",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Email Outbound",
@@ -809,11 +605,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_39pe4w",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Ads",
@@ -826,11 +622,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_n1ecjd",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Email Outbound",
@@ -843,11 +639,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_2y5h39",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Messaging",
