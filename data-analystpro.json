@@ -469,11 +469,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_lv6g4k",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Content",
@@ -656,11 +656,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_6raij6",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Messaging",
