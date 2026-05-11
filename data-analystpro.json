@@ -1591,11 +1591,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_8iyz6v",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "LinkedIn Content",
@@ -1608,11 +1608,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_hdbzxi",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -1626,10 +1626,10 @@
     "priority": "Medium",
     "owner": "Sebuh",
     "start": false,
-    "paused": false,
+    "paused": true,
     "done": false,
     "id": "task_1776165642298_ok3wwq",
-    "column": "todo"
+    "column": "paused"
   },
   {
     "project": "Email Outbound",
@@ -1659,11 +1659,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_pprb95",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -1676,11 +1676,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1777328571335_ushg6e",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Email Outbound",
@@ -1693,11 +1693,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1777328571335_i0i3mg",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Messaging",
