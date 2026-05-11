@@ -1783,5 +1783,22 @@
     "done": false,
     "id": "task_1777328571335_i9vjrg",
     "column": "todo"
+  },
+  {
+    "project": "CRM",
+    "task": "Research Attio CRM tool",
+    "output": "Analysis and reccomendatiom",
+    "notes": "",
+    "owner": "Sebuh",
+    "priority": "High",
+    "time": "",
+    "timetaken": "",
+    "links": "",
+    "deadline": "",
+    "column": "inprogress",
+    "start": true,
+    "paused": false,
+    "done": false,
+    "id": "task_1778502560088_635g9v"
   }
 ]
