@@ -758,11 +758,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_g9worl",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "LinkedIn Ads",
@@ -809,11 +809,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_doemg1",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Funnel Assets",
@@ -911,11 +911,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_rvhumk",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Messaging",
@@ -996,11 +996,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_pmjh4u",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Video Content",
@@ -1030,11 +1030,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_hmm3u5",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Video Content",
@@ -1115,11 +1115,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_l2ngh2",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Website",
