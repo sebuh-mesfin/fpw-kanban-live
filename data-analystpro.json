@@ -758,11 +758,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": true,
+    "start": false,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_g9worl",
-    "column": "inprogress"
+    "column": "todo"
   },
   {
     "project": "LinkedIn Ads",
@@ -809,11 +809,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": true,
+    "start": false,
     "paused": false,
-    "done": true,
+    "done": false,
     "id": "task_1776165642298_doemg1",
-    "column": "done"
+    "column": "todo"
   },
   {
     "project": "Funnel Assets",
@@ -911,11 +911,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Joseph",
-    "start": true,
+    "start": false,
     "paused": false,
-    "done": true,
+    "done": false,
     "id": "task_1776165642298_rvhumk",
-    "column": "done"
+    "column": "todo"
   },
   {
     "project": "Messaging",
@@ -996,11 +996,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Joseph",
-    "start": true,
+    "start": false,
     "paused": false,
-    "done": true,
+    "done": false,
     "id": "task_1776165642298_pmjh4u",
-    "column": "done"
+    "column": "todo"
   },
   {
     "project": "Video Content",
@@ -1030,11 +1030,11 @@
     "timetaken": "",
     "priority": "Medium",
     "owner": "Joseph",
-    "start": true,
+    "start": false,
     "paused": false,
-    "done": true,
+    "done": false,
     "id": "task_1776165642298_hmm3u5",
-    "column": "done"
+    "column": "todo"
   },
   {
     "project": "Video Content",
@@ -1115,11 +1115,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Joseph",
-    "start": true,
+    "start": false,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_l2ngh2",
-    "column": "inprogress"
+    "column": "todo"
   },
   {
     "project": "Website",
@@ -1217,11 +1217,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Joseph",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1776165642298_zkndrt",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "Website",
@@ -1302,11 +1302,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Omar",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1776165642298_ql4wc9",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Strategy",
@@ -1422,10 +1422,10 @@
     "priority": "High",
     "owner": "Omar",
     "start": false,
-    "paused": false,
+    "paused": true,
     "done": false,
     "id": "task_1776165642298_efv3mp",
-    "column": "todo"
+    "column": "paused"
   },
   {
     "project": "Website",
@@ -1439,10 +1439,10 @@
     "priority": "High",
     "owner": "Omar",
     "start": false,
-    "paused": false,
+    "paused": true,
     "done": false,
     "id": "task_1776165642298_8ps95r",
-    "column": "todo"
+    "column": "paused"
   },
   {
     "project": "Project Management",
