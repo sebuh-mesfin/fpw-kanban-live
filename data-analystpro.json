@@ -1439,10 +1439,10 @@
     "priority": "High",
     "owner": "Omar",
     "start": false,
-    "paused": false,
+    "paused": true,
     "done": false,
     "id": "task_1776165642298_clo8ck",
-    "column": "todo"
+    "column": "paused"
   },
   {
     "project": "LinkedIn Engagement",
@@ -1473,10 +1473,10 @@
     "priority": "Medium",
     "owner": "Omar",
     "start": false,
-    "paused": false,
+    "paused": true,
     "done": false,
     "id": "task_1776165642298_je9rau",
-    "column": "todo"
+    "column": "paused"
   },
   {
     "project": "Product",
@@ -1490,10 +1490,10 @@
     "priority": "High",
     "owner": "Elliott",
     "start": false,
-    "paused": false,
+    "paused": true,
     "done": false,
     "id": "task_1776165642298_sdp5jv",
-    "column": "todo"
+    "column": "paused"
   },
   {
     "project": "Product",
@@ -1510,23 +1510,6 @@
     "paused": false,
     "done": false,
     "id": "task_1776165642298_f10p99",
-    "column": "todo"
-  },
-  {
-    "project": "Product",
-    "task": "Support product transition from Excel widget towards cloud/web-based app",
-    "output": "Cloud/web app transition plan",
-    "time": "",
-    "notes": "Source: GTM Messaging Workshop 19 Mar",
-    "links": "",
-    "deadline": "",
-    "timetaken": "",
-    "priority": "High",
-    "owner": "Elliott",
-    "start": false,
-    "paused": false,
-    "done": false,
-    "id": "task_1776165642298_nb3ncd",
     "column": "todo"
   },
   {
@@ -1558,10 +1541,10 @@
     "priority": "Medium",
     "owner": "Elliott",
     "start": false,
-    "paused": false,
+    "paused": true,
     "done": false,
     "id": "task_1776165642298_35vsur",
-    "column": "todo"
+    "column": "paused"
   },
   {
     "project": "LinkedIn Content",
@@ -1693,11 +1676,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1777328571335_98ed3j",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Paid Social",
@@ -1727,11 +1710,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
     "done": false,
     "id": "task_1777328571335_t1ky76",
-    "column": "todo"
+    "column": "inprogress"
   },
   {
     "project": "Video Content",
@@ -1778,11 +1761,11 @@
     "timetaken": "",
     "priority": "High",
     "owner": "Sebuh",
-    "start": false,
+    "start": true,
     "paused": false,
-    "done": false,
+    "done": true,
     "id": "task_1777328571335_i9vjrg",
-    "column": "todo"
+    "column": "done"
   },
   {
     "project": "CRM",
